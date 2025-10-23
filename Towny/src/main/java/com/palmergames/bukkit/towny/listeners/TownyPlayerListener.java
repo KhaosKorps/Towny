@@ -201,7 +201,7 @@ public class TownyPlayerListener implements Listener {
 		ChunkNotificationUtil.cancelPlayerTasks(event.getPlayer());
 	}
 	
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		if (plugin.isError() || event.getRespawnReason() == PlayerRespawnEvent.RespawnReason.END_PORTAL || !TownySettings.isTownRespawning()) {
 			return;
@@ -217,12 +217,12 @@ public class TownyPlayerListener implements Listener {
 		Resident resident = TownyAPI.getInstance().getResident(player);
 
 		// Towny or the Resident might be prioritizing bed spawns over town spawns.
-		if (TownySettings.getBedUse() ||
-			(resident != null && resident.hasMode("bedspawn"))) {
+		//if (TownySettings.getBedUse() ||
+			//(resident != null && resident.hasMode("bedspawn"))) {
 			Location bed = BukkitTools.getBedOrRespawnLocation(player);
 			if (bed != null)
 				respawn = bed;
-		}
+		//}
 
 		// Town spawn could be null and no bed was available.
 		if (respawn == null)
@@ -809,7 +809,7 @@ public class TownyPlayerListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-			if (!TownySettings.JailAllowsTeleportItems() && (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CHORUS_FRUIT)) {
+			if (!TownySettings.JailAllowsTeleportItems() && (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CONSUMABLE_EFFECT)) {
 				TownyMessaging.sendErrorMsg(event.getPlayer(), Translatable.of("msg_err_jailed_players_no_teleport"));
 				event.setCancelled(true);
 				return;
@@ -827,7 +827,7 @@ public class TownyPlayerListener implements Listener {
 						event.setCancelled(true);
 						return;
 					}
-					if (!TownySettings.canOutlawsUseTeleportItems() && (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CHORUS_FRUIT)) {
+					if (!TownySettings.canOutlawsUseTeleportItems() && (event.getCause() == TeleportCause.ENDER_PEARL || event.getCause() == TeleportCause.CONSUMABLE_EFFECT)) {
 						TownyMessaging.sendErrorMsg(event.getPlayer(), Translatable.of("msg_err_outlawed_players_no_teleport"));
 						event.setCancelled(true);
 						return;
@@ -837,7 +837,7 @@ public class TownyPlayerListener implements Listener {
 		}
 
 		// Test to see if CHORUS_FRUIT is in the item_use list.
-		if (event.getCause() == TeleportCause.CHORUS_FRUIT && TownySettings.isItemUseMaterial(Material.CHORUS_FRUIT, event.getTo())) {
+		if (event.getCause() == TeleportCause.CONSUMABLE_EFFECT && TownySettings.isItemUseMaterial(Material.CHORUS_FRUIT, event.getTo())) {
 			//Make decision on whether this is allowed using the PlayerCache and then a cancellable event.
 			if (!TownyActionEventExecutor.canItemuse(event.getPlayer(), event.getTo(), Material.CHORUS_FRUIT)) {
 				event.setCancelled(true);
