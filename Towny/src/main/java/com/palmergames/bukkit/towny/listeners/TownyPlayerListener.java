@@ -1,5 +1,7 @@
 package com.palmergames.bukkit.towny.listeners;
 
+import com.earth2me.essentials.Essentials;
+import com.earth2me.essentials.User;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyMessaging;
@@ -93,6 +95,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Handle events for all Player related events
@@ -225,8 +228,11 @@ public class TownyPlayerListener implements Listener {
 		//}
 
 		// Town spawn could be null and no bed was available.
-		if (respawn == null)
+		if (respawn == null) {
+			if(tryEssentialsRandomSpawn(player))
+				return;
 			return;
+		}
 		
 		// Check if only respawning in the same world as the town's spawn.
 		if (TownySettings.isTownRespawningInOtherWorlds() && !player.getWorld().equals(respawn.getWorld()))
@@ -238,6 +244,31 @@ public class TownyPlayerListener implements Listener {
 		long protectionTime = TownySettings.getSpawnProtectionDuration();
 		if (protectionTime > 0L && resident != null)
 			resident.addRespawnProtection(protectionTime);
+	}
+	
+	private boolean tryEssentialsRandomSpawn(final Player player) {
+		if(plugin.getEssentials() != null)
+		{
+			final Essentials ess = plugin.getEssentials();
+			final String name = ess.getSettings().getRandomRespawnLocation();
+			
+			if (name == null || !ess.getRandomTeleport().hasLocation(name)) {
+				return false;
+			}
+			
+			final User user = ess.getUser(player);
+			
+			if(user == null) return false;
+			
+			ess.getRandomTeleport().getRandomLocation(name).thenAccept(location -> {
+				final CompletableFuture<Boolean> future = new CompletableFuture<>();
+				user.getAsyncTeleport().now(location, false, PlayerTeleportEvent.TeleportCause.PLUGIN, future);
+			});
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)

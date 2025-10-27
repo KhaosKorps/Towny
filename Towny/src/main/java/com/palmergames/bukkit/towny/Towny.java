@@ -1,5 +1,7 @@
  package com.palmergames.bukkit.towny;
 
+import com.earth2me.essentials.Essentials;
+
 import com.palmergames.bukkit.config.CommentedConfiguration;
 import com.palmergames.bukkit.config.ConfigNodes;
 import com.palmergames.bukkit.config.migration.ConfigMigrator;
@@ -71,6 +73,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.ApiStatus;
@@ -108,6 +111,10 @@ public class Towny extends JavaPlugin {
 
 	private final Map<UUID, PlayerCache> playerCache = Collections.synchronizedMap(new HashMap<>());
 	private final Set<TownyInitException.TownyError> errors = new HashSet<>();
+	
+	private Essentials essentials;
+	
+	public Essentials getEssentials() { return essentials; }
 	
 	public Towny() {
 		plugin = this;
@@ -187,6 +194,10 @@ public class Towny extends JavaPlugin {
 		}
 
 		registerEvents();
+		
+		setupEssentials();
+		if (essentials != null)
+			plugin.getLogger().info("✅ Hooked into Essentials");
 
 		Bukkit.getLogger().info("=============================================================");
 		if (isError()) {
@@ -213,6 +224,12 @@ public class Towny extends JavaPlugin {
 					scheduler.run(new OnPlayerLogin(this, player));
 				}
 		}
+	}
+	
+	private void setupEssentials() {
+		Plugin plugin = getServer().getPluginManager().getPlugin("Essentials");
+		if (plugin instanceof Essentials)
+			essentials = (Essentials) plugin;
 	}
 
 	public void loadFoundation(boolean reload) {
