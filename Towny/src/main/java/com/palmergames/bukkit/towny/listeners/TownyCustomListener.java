@@ -15,6 +15,7 @@ import com.palmergames.bukkit.towny.event.DeleteTownEvent;
 import com.palmergames.bukkit.towny.event.NationAddEnemyEvent;
 import com.palmergames.bukkit.towny.event.NewTownEvent;
 import com.palmergames.bukkit.towny.event.PlayerChangePlotEvent;
+import com.palmergames.bukkit.towny.event.RenameTownEvent;
 import com.palmergames.bukkit.towny.event.SpawnEvent;
 import com.palmergames.bukkit.towny.event.TownAddResidentEvent;
 import com.palmergames.bukkit.towny.event.TownBlockPermissionChangeEvent;
@@ -471,7 +472,18 @@ public class TownyCustomListener implements Listener {
 		.filter(Resident::isOnline)
 		.forEach(r -> TownyPerms.assignPermissions(r, r.getPlayer()));
 	}
-	
+
+	/*
+	 * Update permissions when a town is renamed so the faction.<townname> permission is updated.
+	 */
+	@EventHandler
+	public void onTownRename(RenameTownEvent event) {
+		event.getTown().getResidents()
+		.stream()
+		.filter(Resident::isOnline)
+		.forEach(r -> TownyPerms.assignPermissions(r, r.getPlayer()));
+	}
+
 	@EventHandler
 	public void onNationLevelIncrease(NationLevelIncreaseEvent event) {
 		if (!TownyPerms.ranksWithNationLevelRequirementPresent())

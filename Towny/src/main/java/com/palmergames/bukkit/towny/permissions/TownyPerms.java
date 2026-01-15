@@ -294,6 +294,9 @@ public class TownyPerms {
 		//Check for town membership
 		final Town town = resident.getTownOrNull();
 		if (town != null) {
+			// Add faction permission with normalized town name
+			permList.add(getFactionPermission(town));
+
 			permList.addAll(getTownDefault(town.getName().toLowerCase(Locale.ROOT)));
 			
 			// Is Mayor?
@@ -955,5 +958,18 @@ public class TownyPerms {
 	@ApiStatus.Internal
 	public static CommentedConfiguration getTownyPermsFile() {
 		return perms;
+	}
+
+	/**
+	 * Gets the faction permission node for a town.
+	 * The permission format is "faction.{normalized_town_name}" where the town name
+	 * is lowercase with spaces replaced by underscores.
+	 *
+	 * @param town The town to get the faction permission for
+	 * @return The faction permission node string (e.g., "faction.my_cool_town")
+	 */
+	public static String getFactionPermission(Town town) {
+		String normalizedTownName = town.getName().toLowerCase(Locale.ROOT).replace(" ", "_");
+		return "faction." + normalizedTownName;
 	}
 }
