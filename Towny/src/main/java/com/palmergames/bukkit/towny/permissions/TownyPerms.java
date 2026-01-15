@@ -961,6 +961,16 @@ public class TownyPerms {
 	}
 
 	/**
+	 * Gets the normalized name for a town
+	 *
+	 * @param town The town to get the faction permission for
+	 * @return The normalized name string (e.g., "my_cool_town")
+	 */
+	public static String getNormalizedName(Town town) {
+		return town.getName().toLowerCase(Locale.ROOT).replace(" ", "_");
+	}
+	
+	/**
 	 * Gets the faction permission node for a town.
 	 * The permission format is "faction.{normalized_town_name}" where the town name
 	 * is lowercase with spaces replaced by underscores.
@@ -969,7 +979,6 @@ public class TownyPerms {
 	 * @return The faction permission node string (e.g., "faction.my_cool_town")
 	 */
 	public static String getFactionPermission(Town town) {
-		String normalizedTownName = town.getName().toLowerCase(Locale.ROOT).replace(" ", "_");
-		return "faction." + normalizedTownName;
+		return "faction." + getNormalizedName(town);
 	}
 }

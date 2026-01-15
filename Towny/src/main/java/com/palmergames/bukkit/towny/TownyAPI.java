@@ -18,6 +18,7 @@ import com.palmergames.bukkit.towny.object.WorldCoord;
 import com.palmergames.bukkit.towny.object.PlayerCache.TownBlockStatus;
 import com.palmergames.bukkit.towny.object.metadata.CustomDataField;
 import com.palmergames.bukkit.towny.permissions.PermissionNodes;
+import com.palmergames.bukkit.towny.permissions.TownyPerms;
 import com.palmergames.bukkit.towny.tasks.TeleportWarmupTimerTask;
 import com.palmergames.bukkit.towny.utils.CombatUtil;
 import com.palmergames.bukkit.towny.utils.ProximityUtil;
@@ -974,5 +975,30 @@ public class TownyAPI {
 	 */
 	public void testTownUnclaimOrThrow(Town town, WorldCoord coordToUnclaim) throws TownyException {
 		ProximityUtil.allowTownUnclaimOrThrow(coordToUnclaim.getTownyWorld(), coordToUnclaim, town);
+	}
+
+	/**
+	 * Gets the normalized name for a town.
+	 * The name is lowercase with spaces replaced by underscores.
+	 *
+	 * @param town The town to get the normalized name for.
+	 * @return The normalized name string (e.g., "my_cool_town").
+	 */
+	@NotNull
+	public String getNormalizedTownName(@NotNull Town town) {
+		return TownyPerms.getNormalizedName(town);
+	}
+
+	/**
+	 * Gets the faction permission node for a town.
+	 * The permission format is "faction.{normalized_town_name}" where the town name
+	 * is lowercase with spaces replaced by underscores.
+	 *
+	 * @param town The town to get the faction permission for.
+	 * @return The faction permission node string (e.g., "faction.my_cool_town").
+	 */
+	@NotNull
+	public String getFactionPermission(@NotNull Town town) {
+		return TownyPerms.getFactionPermission(town);
 	}
 }
