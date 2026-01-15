@@ -8,7 +8,7 @@
         <groupId>com.palmergames.bukkit.towny</groupId>
         <artifactId>towny-parent</artifactId>
         <relativePath>../../pom.xml</relativePath>
-        <version>1.0.0</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>towny-folia-provider</artifactId>
