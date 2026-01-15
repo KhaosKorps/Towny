@@ -119,7 +119,7 @@ nation_help_14: "Dołączenie do otwartej nacji."
 nation_help_15: "Przelewa pieniądze do banku nacji."
 nation_help_16: "Usuwa twoją nację."
 nation_help_17: "Dodaje lub usuwa rangi mieszkańcom."
-nation_help_18: "Użyj \"/n rank ?\", by uzyskać pomoc."
+nation_help_18: "Użyj \"/n rank ?\", by uzyskać pomoc.."
 nation_list_help_0: "Wyświetla podaną stronę."
 nation_list_help_1: "Lista nacji sortowana według liczby mieszkańców, otwarta na podanej stronie."
 nation_list_help_2: "Lista nacji sortowana według liczb miast, otwarta na podanej stronie."
@@ -954,6 +954,7 @@ msg_err_nation_not_public: '&cNacja nie jest publiczna.'
 msg_nation_toggle_public: '&aZmieniono publiczny status nacji.'
 status_yes: '&aTAK'
 status_no: '&cNIE'
+msg_err_unable_to_use_bank_outside_bank_plot: 'You cannot use that command outside of a bank or home plot. Bank plots are created using /plot set bank.'
 msg_err_nation_spawn_forbidden: '&cSpawn do nacji jest zabroniony.'
 msg_err_nation_spawn_forbidden_war: '&cTeleportacja na spawn nacji jest dozwolona tylko podczas wojny.'
 msg_err_nation_spawn_forbidden_peace: '&cSpawn w nacji jest niedozwolony podczas wojny.'

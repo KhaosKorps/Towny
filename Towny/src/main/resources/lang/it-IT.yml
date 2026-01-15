@@ -61,6 +61,7 @@ town_help_32: "Usare /t set ? per aiuto."
 town_help_33: "Usare /t buy ? per aiuto."
 town_help_34: "Usare /t toggle ? per aiuto."
 town_help_35: "Usare /t rank ? per aiuto."
+town_help_36: 'Elenca le città vicine ordinate in base alla distanza.'
 town_list_help_0: "Visualizza la pagina specificata."
 town_list_help_1: "Elenca le città per numero residente, con la pagina specificata."
 town_list_help_2: "Elenca le città che sono aperte, con la pagina specificata."
@@ -264,7 +265,7 @@ townyadmin_town_help_15: "Apri il libro della cronologia bancaria della città."
 townyadmin_town_help_16: "Modifica i fuorilegge di una città."
 townyadmin_town_help_17: "Fai uscire la città dalla sua nazione."
 townyadmin_town_help_18: "Rimuovere lo status di conquistato da una città."
-townyadmin_town_toggle_help_0: "Attiva/Disattiva il pvp della città."
+townyadmin_town_toggle_help_0: "Attiva/disattiva il pvp della città."
 townyadmin_town_toggle_help_1: "Attiva/disattiva il forcepvp, impedendo ai sindaci di disattivare il pvp."
 townyadmin_town_toggle_help_2: "Attiva/disattiva lo status pubblico della città, consentendo ai non residenti di teletrasportarsi lì."
 townyadmin_town_toggle_help_3: "Attiva/disattiva le impostazioni delle esplosioni della città."
@@ -396,7 +397,7 @@ plot_jailcell_help_1: "Rimuove una cella nel luogo in cui ti trovi."
 msg_block_claim: 'Claima questo lotto di città'
 msg_block_claim_radius: 'Claima un raggio di plot che ti circondano.'
 msg_plot_nfs: 'Togli un lotto dalla vendita'
-msg_plot_nfs_radius: 'dsa'
+msg_plot_nfs_radius: 'Ritira dei plot dalla vendita entro un raggio'
 msg_nfs_abr: '&e''fs'' e ''nfs'' sono abbreviazioni accettate per ''forsale'' e ''notforsale''.'
 msg_plot_fs: 'Metti questa zona in vendita.'
 msg_plot_fs_radius: 'Metti in vendita un raggio di plot.'
@@ -1861,6 +1862,7 @@ msg_spawn_cost_free: 'Gratuito'
 #Message shown when someone tries to set a plot's type to one already set.
 msg_plot_already_of_type: 'Questo plot è già di tipo %s.'
 msg_town_board_reset: '&bRipristino bordo della città.'
+msg_nation_board_reset: '&bBacheca della Nazione ripristinata.'
 msg_town_has_no_jailslots: 'La prigione della città è piena.'
 msg_player_has_been_sent_to_jail_into_cell_number_x_for_x_hours_by_x_for_x_bail: '%s è stato inviato a %s nel numero di cella %s per %s ore con una cauzione di %s da %s.'
 msg_player_has_been_sent_to_jail_into_cell_number_x_for_x_hours_by_x: '%s è stato inviato a %s nel numero di cella %s per %s ore da %s.'
@@ -2132,3 +2134,21 @@ msg_err_you_cannot_add_towntrust_on_enemy: "Non puoi trustare una città che è 
 status_world_jailing: "Carcerazione: "
 msg_version_build_info: "<dark_green>Informazioni sulla costruzione:<green>%s</green> sul ramo<green>%s<green>."
 msg_version_build_info_failed: "<red>Impossibile recuperare le informazioni di compilazione per questa versione."
+time-future: "in futuro"
+time-just-now: "adesso"
+time-a-minute-ago: "un minuto fa"
+time-x-minutes-ago: "%d minuti fa"
+time-an-hour-ago: "un'ora fa"
+time-x-hours-ago: "%d ore fa"
+time-yesterday: "ieri"
+time-x-days-ago: "%d giorni fa"
+time-a-year-ago: "un anno fa"
+time-x-years-ago: "%d anni fa"
+#Shown instead of status_lastonline if the player is currently online
+status_onlinesince: "Online da:"
+msg_a_player_spawned_to_your_town_earning_you_x: "Il giocatore %s è spawnato alla tua città, facendoti guadagnare %s."
+msg_you_have_been_refunded_your_town_cost: "Ti sono stati rimborsati %s perché la tua città aveva meno di %s ora/e e non ha claimato più di %s blocchi."
+msg_nearby_towns: 'Città vicine'
+msg_no_towns_nearby: 'Nessuna città trovata nelle vicinanze.'
+msg_nearby_town_format: '<green>%s <white>(%s blocchi)'
+msg_nearby_town_nation: ' <aqua>[%s]'

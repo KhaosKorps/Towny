@@ -559,6 +559,7 @@ public enum HelpMenu {
 				.add("new [name]", Translatable.of("town_help_11"))
 				.add("here", Translatable.of("town_help_4"))
 				.add("list", Translatable.of("town_help_26"))
+				.add("nearby", Translatable.of("town_help_36"))
 				.add("online", Translatable.of("town_help_10"))
 				.add("leave", Translatable.of("town_help_27"))
 				.add("reclaim", Translatable.of("town_help_12"))
@@ -848,9 +849,9 @@ public enum HelpMenu {
 		protected MenuBuilder load() {
 			return new MenuBuilder("resident jail")
 				.add("", "/resident jail", "paybail", Translatable.of("res_jail_help_0"))
-				.add(Colors.LightBlue + Translation.of("msg_resident_bail_amount") + Colors.Green + "$" + TownySettings.getBailAmount())
-				.add(Colors.LightBlue + Translation.of("msg_mayor_bail_amount") + Colors.Green + "$" + TownySettings.getBailAmountMayor())
-				.add(Colors.LightBlue + Translation.of("msg_king_bail_amount") + Colors.Green + "$" + TownySettings.getBailAmountKing());
+				.add(Colors.AQUA + Translation.of("msg_resident_bail_amount") + Colors.DARK_GREEN + "$" + TownySettings.getBailAmount())
+				.add(Colors.AQUA + Translation.of("msg_mayor_bail_amount") + Colors.DARK_GREEN + "$" + TownySettings.getBailAmountMayor())
+				.add(Colors.AQUA + Translation.of("msg_king_bail_amount") + Colors.DARK_GREEN + "$" + TownySettings.getBailAmountKing());
 		}
 	},
 

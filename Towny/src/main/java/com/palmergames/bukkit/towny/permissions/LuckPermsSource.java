@@ -2,7 +2,6 @@ package com.palmergames.bukkit.towny.permissions;
 
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.Resident;
-import com.palmergames.bukkit.util.BukkitTools;
 import com.palmergames.bukkit.util.Colors;
 import net.kyori.adventure.util.TriState;
 import net.luckperms.api.LuckPerms;
@@ -146,7 +145,15 @@ public class LuckPermsSource extends TownyPermissionSource {
 			return super.strictHas(permissible, node);
 		}
 
-		return convertTriState(this.adapter.getUser(player).getCachedData().getPermissionData(luckPerms.getContextManager().getQueryOptions(player)).checkPermission(node));
+		final User user;
+		try {
+			user = this.adapter.getUser(player);
+		} catch (IllegalStateException ignored) {
+			// thrown if luckperms is not able to get a user for the player, such as with NPCs from plugins
+			return super.strictHas(permissible, node);
+		}
+
+		return convertTriState(user.getCachedData().getPermissionData(luckPerms.getContextManager().getQueryOptions(player)).checkPermission(node));
 	}
 
 	@Nullable

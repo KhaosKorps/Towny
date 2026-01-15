@@ -1401,6 +1401,18 @@ public class TownySettings {
 		return StringMgmt.containsIgnoreCase(getStrArr(ConfigNodes.PLUGIN_MODS_FAKE_RESIDENTS), name);
 	}
 
+	public static boolean refundDeletedNewTowns() {
+		return getBoolean(ConfigNodes.ECO_REFUND_ALLOW_REFUND_ON_DELETION);
+	}
+
+	public static int refundDeletedNewTownsMaxHours() {
+		return getInt(ConfigNodes.ECO_REFUND_MAX_TOWN_AGE_IN_HOURS);
+	}
+
+	public static int refundDeletedNewTownsMaxTownBlocks() {
+		return getInt(ConfigNodes.ECO_REFUND_MAX_CLAIMS);
+	}
+
 	public static double getNewTownPrice() {
 
 		return getDouble(ConfigNodes.ECO_PRICE_NEW_TOWN);
@@ -1465,6 +1477,10 @@ public class TownySettings {
 		return getBoolean(ConfigNodes.GNATION_SETTINGS_DISPLAY_NATIONBOARD_ONLOGIN);
 	}
 	
+	public static int getMaxBoardLength() {
+		return getInt(ConfigNodes.GTOWN_SETTINGS_MAX_BOARD_LENGTH);
+	}
+
 	public static boolean nationCapitalsCantBeNeutral() {
 		return getBoolean(ConfigNodes.GNATION_SETTINGS_CAPITAL_CANNOT_BE_NEUTRAL);
 	}
@@ -2128,6 +2144,10 @@ public class TownySettings {
 		return getBoolean(ConfigNodes.ECO_BANK_IS_DELETED_OBJECT_BALANCE_PAID_TO_OWNER);
 	}
 
+	public static boolean areZeroOrLowerBankAccountsHiddenOnLists() {
+		return getBoolean(ConfigNodes.ECO_BANK_HIDE_ZERO_OR_LESS_BANK_ACCOUNTS_ON_LISTS);
+	}
+
 	public static boolean isEcoClosedEconomyEnabled() {
 		
 		return getBoolean(ConfigNodes.ECO_CLOSED_ECONOMY_ENABLED);
@@ -2430,6 +2450,11 @@ public class TownySettings {
 		return getString(ConfigNodes.NATION_DEF_BOARD);
 	}
 
+	public static boolean getNationDefaultNeutral() {
+
+		return getBoolean(ConfigNodes.NATION_DEF_NEUTRAL);
+	}
+	
 	public static double getNationDefaultTax() {
 
 		return getDouble(ConfigNodes.NATION_DEF_TAXES_TAX);
@@ -3134,12 +3159,29 @@ public class TownySettings {
 	}
 
 	public static double getTownBankCap(Town town) {
-		return town.getTownLevel().bankCapModifier * getTownBankCap(); 
+		double cap = getTownBankCap();
+		if (!isTownBankCapPlotBased())
+			return town.getTownLevel().bankCapModifier * cap;
+
+		double multiplier = isPlotBasedTownBankCapUsingTownLevelModifier() ? town.getTownLevel().bankCapModifier : 1;
+		return Math.max(cap * town.getNumTownBlocks() * multiplier, getPlotBasedTownBankCapMinimumAmount());
 	}
 
 	public static double getTownBankCap() {
 
 		return getDouble(ConfigNodes.ECO_BANK_CAP_TOWN);
+	}
+
+	public static boolean isTownBankCapPlotBased() {
+		return getBoolean(ConfigNodes.ECO_BANK_CAP_PLOT_BASED);
+	}
+
+	public static double getPlotBasedTownBankCapMinimumAmount() {
+		return getDouble(ConfigNodes.ECO_BANK_CAP_PLOT_BASED_MIN_AMOUNT);
+	}
+
+	public static boolean isPlotBasedTownBankCapUsingTownLevelModifier() {
+		return getBoolean(ConfigNodes.ECO_BANK_CAP_PLOT_BASED_USES_TOWN_LEVEL_MODIFIER);
 	}
 
 	public static int getTownMinDeposit() {
@@ -3491,6 +3533,10 @@ public class TownySettings {
 
 	public static List<String> getOrderOfMayoralSuccession() {
 		return getStrArr(ConfigNodes.GTOWN_ORDER_OF_MAYORAL_SUCCESSION);
+	}
+
+	public static List<String> getAssistantRankNameList() {
+		return getStrArr(ConfigNodes.GTOWN_NAMES_OF_ASSISTANT_RANKS);
 	}
 
 	public static boolean isWarAllowed() {

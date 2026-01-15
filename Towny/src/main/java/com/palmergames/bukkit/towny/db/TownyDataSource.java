@@ -1,6 +1,7 @@
 package com.palmergames.bukkit.towny.db;
 
 import com.palmergames.bukkit.towny.Towny;
+import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyMessaging;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.TownyUniverse;
@@ -47,18 +48,28 @@ public abstract class TownyDataSource {
 	final Lock lock = new ReentrantLock();
 	protected final Towny plugin;
 	protected final TownyUniverse universe;
+	protected final TownyAPI api;
 
 	TownyDataSource(Towny plugin, TownyUniverse universe) {
 		this.plugin = plugin;
 		this.universe = universe;
+		this.api = TownyAPI.getInstance();
 	}
 
 	public abstract boolean backup() throws IOException;
 
 	public boolean loadAll() {
 
-		return loadWorldList() && loadNationList() && loadTownList() && loadPlotGroupList() && loadDistrictList() && loadJailList() && loadResidentList() && loadTownBlockList() && loadWorlds() && loadResidents() && loadTowns() && loadNations() && loadTownBlocks() && loadPlotGroups() && loadDistricts() && loadJails() && loadRegenList() && loadCooldowns();
+		final boolean loaded = loadWorldList() && loadNationList() && loadTownList() && loadPlotGroupList() && loadDistrictList() && loadJailList() && loadResidentList() && loadTownBlockList() && loadWorlds() && loadResidents() && loadTowns() && loadNations() && loadTownBlocks() && loadPlotGroups() && loadDistricts() && loadJails() && loadRegenList() && loadCooldowns();
+
+		if (loaded) {
+			postLoad();
+		}
+
+		return loaded;
 	}
+	
+	public void postLoad() {}
 
 	public boolean saveAll() {
 
@@ -346,10 +357,18 @@ public abstract class TownyDataSource {
 
 	abstract public boolean removeNation(@NotNull Nation nation, @NotNull DeleteNationEvent.Cause cause, @Nullable CommandSender sender);
 
+	/**
+	 * @deprecated Use {@link #newResident(String, UUID)} instead.
+	 */
+	@Deprecated(since = "0.102.0.4")
 	abstract public @NotNull Resident newResident(String name) throws AlreadyRegisteredException, NotRegisteredException;
 
 	abstract public @NotNull Resident newResident(String name, UUID uuid) throws AlreadyRegisteredException, NotRegisteredException;
 	
+	/**
+	 * @deprecated Use {@link #newNation(String, UUID)} instead.
+	 */
+	@Deprecated(since = "0.102.0.4")
 	abstract public void newNation(String name) throws AlreadyRegisteredException, NotRegisteredException;
 
 	abstract public void newNation(String name, UUID uuid) throws AlreadyRegisteredException, NotRegisteredException;

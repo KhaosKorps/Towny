@@ -141,8 +141,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -182,6 +184,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		"list",
 		"mayor",
 		"merge",
+		"nearby",
 		"new",
 		"nfs",
 		"notforsale",
@@ -673,6 +676,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		case "list" -> listTowns(player, split);
 		case "mayor" -> parseTownyMayorCommand(player);
 		case "merge"-> parseTownMergeCommand(player, subArg);
+		case "nearby" -> parseTownNearbyCommand(player);
 		case "new", "create"-> parseTownNewCommand(player, split);
 		case "notforsale", "nfs"-> parseTownNotForSaleCommand(player);
 		case "online"-> parseTownOnlineCommand(player, subArg);
@@ -1108,7 +1112,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		List<Resident> onlineResidents = ResidentUtil.getOnlineResidentsViewable(player, town);
 		String output = onlineResidents.size() > 0
 			? TownyFormatter.getFormattedOnlineResidents(translator.of("msg_town_online"), town, player)
-			: Colors.White + "0 " + translator.of("res_list") + " " + (translator.of("msg_town_online") + ": " + town);
+			: Colors.WHITE + "0 " + translator.of("res_list") + " " + (translator.of("msg_town_online") + ": " + town);
 		TownyMessaging.sendMessage(player, output);
 	}
 
@@ -1119,6 +1123,50 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		if (town == null)
 			throw new TownyException(Translatable.of("msg_not_claimed", Coord.parseCoord(player.getLocation())));
 		townStatusScreen(player, town);
+	}
+
+	private void parseTownNearbyCommand(Player player) throws TownyException {
+		checkPermOrThrow(player, PermissionNodes.TOWNY_COMMAND_TOWN_NEARBY.getNode());
+		Location loc = player.getLocation();
+		TownyWorld world = TownyAPI.getInstance().getTownyWorld(loc.getWorld().getName());
+		
+		if (world == null || !world.isUsingTowny())
+			throw new TownyException(Translatable.of("msg_err_usingtowny_disabled"));
+		
+		plugin.getScheduler().runAsync(() -> {
+			Map<Town, Double> townDistances = new HashMap<>();
+			for (Town town : world.getTownsInWorld()) {
+				Location spawn = town.getSpawnOrNull();
+				if (spawn == null || !spawn.getWorld().equals(loc.getWorld()))
+					continue;
+				
+				double distSquared = spawn.distanceSquared(loc);
+				townDistances.put(town, distSquared);
+			}
+			
+			if (townDistances.isEmpty()) {
+				TownyMessaging.sendErrorMsg(player, Translatable.of("msg_no_towns_nearby"));
+				return;
+			}
+			
+			Translator translator = Translator.locale(player);
+			TownyMessaging.sendMessage(player, ChatTools.formatTitle(translator.of("msg_nearby_towns")));
+			
+			townDistances.entrySet().stream()
+				.sorted(Comparator.comparingDouble(Map.Entry::getValue))
+				.limit(10)
+				.forEach(entry -> {
+					Town town = entry.getKey();
+					double dist = Math.sqrt(entry.getValue());
+					String msg = translator.of("msg_nearby_town_format", town.getName(), String.format("%.1f", dist));
+					
+					if (town.hasNation()) {
+						msg += translator.of("msg_nearby_town_nation", town.getNationOrNull().getName());
+					}
+					
+					TownyMessaging.sendMessage(player, msg);
+				});
+		});
 	}
 
 	/**
@@ -1941,9 +1989,8 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 				return;
 			}
 			
-			// TownyFormatter shouldn't be given any string longer than 159, or it has trouble splitting lines.
-			if (board.length() > 159)
-				board = board.substring(0, 159);
+			if (board.length() > TownySettings.getMaxBoardLength())
+				board = board.substring(0, TownySettings.getMaxBoardLength());
 		}
 		
 		town.setBoard(board);
@@ -2440,10 +2487,10 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 			throw new TownyException("Config.yml has bonus blocks disabled at town_level section: townBlockBuyBonusLimit: 0");
 		
 		if (split.length < 2) {
-			String line = Colors.Yellow + "[Purchased Bonus] " + Colors.Green + "Cost: " + Colors.LightGreen + "%s" + Colors.Gray + " | " + Colors.Green + "Max: " + Colors.LightGreen + "%d";
+			String line = Colors.YELLOW + "[Purchased Bonus] " + Colors.DARK_GREEN + "Cost: " + Colors.DARK_GREEN + "%s" + Colors.DARK_GRAY + " | " + Colors.DARK_GREEN + "Max: " + Colors.DARK_GREEN + "%d";
 			TownyMessaging.sendMessage(sender, String.format(line, prettyMoney(town.getBonusBlockCost()), TownySettings.getMaxPurchasedBlocks(town)));
 			if (TownySettings.getPurchasedBonusBlocksIncreaseValue() != 1.0)
-				TownyMessaging.sendMessage(sender, Colors.Green + "Cost Increase per TownBlock: " + Colors.LightGreen + "+" +  new DecimalFormat("##.##%").format(TownySettings.getPurchasedBonusBlocksIncreaseValue()-1));
+				TownyMessaging.sendMessage(sender, Colors.DARK_GREEN + "Cost Increase per TownBlock: " + Colors.DARK_GREEN + "+" +  new DecimalFormat("##.##%").format(TownySettings.getPurchasedBonusBlocksIncreaseValue()-1));
 			return;
 		}
 				
@@ -2599,6 +2646,10 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		final String finalName = name;
 		Confirmation.runOnAccept(() -> {
 			try {
+				if (!TownyAPI.getInstance().isWilderness(spawnLocation)) {
+					resident.getAccount().deposit(cost, "New town creation cancelled");
+					throw new TownyException(Translatable.of("msg_already_claimed_1", key));	
+				}
 				// Make town.
 				newTown(world, finalName, resident, key, spawnLocation, player, cost);
 				TownyMessaging.sendGlobalMessage(Translatable.of("msg_new_town", player.getName(), StringMgmt.remUnderscore(finalName)));
@@ -3266,13 +3317,13 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 
 		Translator translator = Translator.locale(sender);
 		TownyMessaging.sendMsg(sender, translator.of("msg_set_perms"));
-		TownyMessaging.sendMessage(sender, (Colors.Green + translator.of("status_perm") + " " + ((townBlockOwner instanceof Resident) ? perm.getColourString().replace("n", "t") : perm.getColourString().replace("f", "r"))));
+		TownyMessaging.sendMessage(sender, (Colors.DARK_GREEN + translator.of("status_perm") + " " + ((townBlockOwner instanceof Resident) ? perm.getColourString().replace("n", "t") : perm.getColourString().replace("f", "r"))));
 		String on = translator.of("status_on");
 		String off = translator.of("status_off");
-		TownyMessaging.sendMessage(sender, Colors.Green + translator.of("status_pvp") + " " + (perm.pvp ? on : off) + " " +
-										   Colors.Green + translator.of("explosions") + " " + (perm.explosion ? on : off) + " " +
-										   Colors.Green + translator.of("firespread") + " " + (perm.fire ? on : off) + " " +
-										   Colors.Green + translator.of("mobspawns") + " " + (perm.mobs ? on : off));
+		TownyMessaging.sendMessage(sender, Colors.DARK_GREEN + translator.of("status_pvp") + " " + (perm.pvp ? on : off) + " " +
+										   Colors.DARK_GREEN + translator.of("explosions") + " " + (perm.explosion ? on : off) + " " +
+										   Colors.DARK_GREEN + translator.of("firespread") + " " + (perm.fire ? on : off) + " " +
+										   Colors.DARK_GREEN + translator.of("mobspawns") + " " + (perm.mobs ? on : off));
 
 		// Reset all caches as this can affect everyone.
 		plugin.resetCache();
@@ -3693,7 +3744,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 
 		// Make sure the town doesn't already own this land.
 		if (overclaimedTown.equals(town))
-			throw new TownyException(Translatable.of("msg_already_claimed_1"));
+			throw new TownyException(Translatable.of("msg_already_claimed", town.getName()));
 
 		// Make sure this is in a town which is overclaimed, allowing for stealing land.
 		if (!wc.canBeStolen())

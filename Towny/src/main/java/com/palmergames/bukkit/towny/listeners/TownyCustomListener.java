@@ -11,6 +11,7 @@ import com.palmergames.bukkit.towny.command.TownyCommand;
 import com.palmergames.bukkit.towny.confirmations.Confirmation;
 import com.palmergames.bukkit.towny.event.BedExplodeEvent;
 import com.palmergames.bukkit.towny.event.ChunkNotificationEvent;
+import com.palmergames.bukkit.towny.event.DeleteTownEvent;
 import com.palmergames.bukkit.towny.event.NationAddEnemyEvent;
 import com.palmergames.bukkit.towny.event.NewTownEvent;
 import com.palmergames.bukkit.towny.event.PlayerChangePlotEvent;
@@ -24,6 +25,7 @@ import com.palmergames.bukkit.towny.event.damage.TownyPlayerDamagePlayerEvent;
 import com.palmergames.bukkit.towny.event.nation.NationLevelDecreaseEvent;
 import com.palmergames.bukkit.towny.event.nation.NationLevelIncreaseEvent;
 import com.palmergames.bukkit.towny.event.nation.NationPreTownLeaveEvent;
+import com.palmergames.bukkit.towny.event.teleport.SuccessfulTownyTeleportEvent;
 import com.palmergames.bukkit.towny.event.town.TownLevelDecreaseEvent;
 import com.palmergames.bukkit.towny.event.town.TownLevelIncreaseEvent;
 import com.palmergames.bukkit.towny.event.town.TownOutlawAddEvent;
@@ -144,6 +146,29 @@ public class TownyCustomListener implements Listener {
 	}
 	
 	/**
+	 * Handles recently-created towns getting a refund when they are deleted.
+	 * 
+	 * @param event DeleteTownEvent to listen to.
+	 */
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onTownDeleted(DeleteTownEvent event) {
+		if (!TownySettings.refundDeletedNewTowns() || event.getMayor() == null || !event.getCause().equals(DeleteTownEvent.Cause.COMMAND))
+			return;
+
+		int maxTownblocks = TownySettings.refundDeletedNewTownsMaxTownBlocks();
+		int maxHours = TownySettings.refundDeletedNewTownsMaxHours();
+		double newTownPrice = TownySettings.getNewTownPrice();
+
+		if (event.getNumTownBlocks() > maxTownblocks || newTownPrice <= 0
+			|| System.currentTimeMillis() - event.getTownCreated() > TimeMgmt.ONE_HOUR_IN_MILLIS * maxHours)
+			return;
+
+		Resident mayor = event.getMayor();
+		mayor.getAccount().deposit(newTownPrice, "Town deletion refund.");
+		TownyMessaging.sendMsg(mayor, Translatable.of("msg_you_have_been_refunded_your_town_cost", TownyEconomyHandler.getFormattedBalance(newTownPrice), maxHours, maxTownblocks));
+	}
+
+	/**
 	 * Runs when a bed or respawn anchor explodes that we can track them in the BlockExplodeEvent,
 	 * which always returns AIR for that event's getBlock().
 	 * @param event {@link BedExplodeEvent}
@@ -201,6 +226,30 @@ public class TownyCustomListener implements Listener {
 			return;
 		event.setCancelled(true);
 		event.setCancelMessage(Translatable.of("msg_error_cannot_town_spawn_youre_an_outlaw_in_town", town.getName()).forLocale(event.getPlayer()));
+	}
+
+	/**
+	 * Used to display a message to the mayor and assistants of a town, alerting
+	 * them to someone spawning at their town when money is earned by the town.
+	 * 
+	 * @param event SuccessfulTownyTeleportEvent thrown when someone spawns to town.
+	 */
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerSpawnToTown(SuccessfulTownyTeleportEvent event) {
+		if (!TownySettings.isTownSpawnPaidToTown() || event.getTeleportCost() <= 0)
+			return;
+
+		Player player = event.getResident().getPlayer();
+		if (player == null)
+			return;
+		Town toTown = TownyAPI.getInstance().getTown(event.getTeleportLocation());
+		if (toTown == null)
+			return;
+		toTown.getResidents().stream()
+			.filter(r -> r.isOnline() && (r.isMayor() || TownyPerms.hasAssistantTownRank(r)))
+			.map(Resident::getPlayer)
+			.forEach(p -> TownyMessaging.sendMsg(p,
+				Translatable.of("msg_a_player_spawned_to_your_town_earning_you_x", player.getName(), TownyEconomyHandler.getFormattedBalance(event.getTeleportCost()))));
 	}
 
 	/**
@@ -263,7 +312,7 @@ public class TownyCustomListener implements Listener {
 		if (!TownySettings.isOverClaimingAllowingStolenLand())
 			return;
 		if (event.getTown().availableTownBlocks() <= TownySettings.getTownBlockRatio())
-			TownyMessaging.sendMsg(event.getResident(), Translatable.literal(Colors.Red).append(Translatable.of("msg_warning_you_are_almost_out_of_townblocks")));
+			TownyMessaging.sendMsg(event.getResident(), Translatable.literal(Colors.DARK_RED).append(Translatable.of("msg_warning_you_are_almost_out_of_townblocks")));
 	}
 	
 	/**
@@ -290,7 +339,7 @@ public class TownyCustomListener implements Listener {
 		if (!TownySettings.isOverClaimingAllowingStolenLand())
 			return;
 		if (town.isOverClaimed())
-			TownyMessaging.sendPrefixedTownMessage(town, Translatable.literal(Colors.Red).append(Translatable.of("msg_warning_your_town_is_overclaimed")));
+			TownyMessaging.sendPrefixedTownMessage(town, Translatable.literal(Colors.DARK_RED).append(Translatable.of("msg_warning_your_town_is_overclaimed")));
 	}
 
 	/**
@@ -468,7 +517,7 @@ public class TownyCustomListener implements Listener {
 					resident.save();
 			}
 			for (TownBlock tb : nationTown.getTownBlocks()) {
-				if (tb.getTrustedResidents().isEmpty())
+				if (!tb.hasTrustedResidents())
 					continue;
 				save = false;
 				for (Resident resident : new ArrayList<>(tb.getTrustedResidents())) {

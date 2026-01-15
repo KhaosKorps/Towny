@@ -13,6 +13,7 @@ import com.palmergames.bukkit.towny.event.NationRemoveTownEvent;
 import com.palmergames.bukkit.towny.event.BonusBlockPurchaseCostCalculationEvent;
 import com.palmergames.bukkit.towny.event.TownBlockClaimCostCalculationEvent;
 import com.palmergames.bukkit.towny.event.TownyObjectFormattedNameEvent;
+import com.palmergames.bukkit.towny.event.plot.group.PlotGroupDeletedEvent;
 import com.palmergames.bukkit.towny.event.town.TownAddAlliedTownEvent;
 import com.palmergames.bukkit.towny.event.town.TownAddEnemiedTownEvent;
 import com.palmergames.bukkit.towny.event.town.TownCalculateTownLevelNumberEvent;
@@ -73,6 +74,7 @@ public class Town extends Government implements TownBlockOwner {
 	private static final String ECONOMY_ACCOUNT_PREFIX = TownySettings.getTownAccountPrefix();
 
 	private final List<Resident> residents = new ArrayList<>();
+	private final List<Resident> residentsView = Collections.unmodifiableList(residents);
 	private final List<Resident> outlaws = new ArrayList<>();
 	private Map<UUID, Town> allies = new LinkedHashMap<>();
 	private Map<UUID, Town> enemies = new LinkedHashMap<>();
@@ -123,8 +125,9 @@ public class Town extends Government implements TownBlockOwner {
 	private int manualTownLevel = -1;
 	private boolean visibleOnTopLists = true;
 
-	public Town(String name) {
-		super(name);
+	@ApiStatus.Internal
+	public Town(String name, UUID uuid) {
+		super(name, uuid);
 		permissions.loadDefault(this);
 		
 		// Set defaults.
@@ -135,9 +138,9 @@ public class Town extends Government implements TownBlockOwner {
 		setPublic(TownySettings.getTownDefaultPublic());
 	}
 	
-	public Town(String name, UUID uuid) {
-		this(name);
-		setUUID(uuid);
+	@Deprecated(since = "0.102.0.4")
+	public Town(String name) {
+		this(name, UUID.randomUUID());
 	}
 
 	@Override
@@ -146,12 +149,7 @@ public class Town extends Government implements TownBlockOwner {
 			return true;
 		if (!(other instanceof Town otherTown))
 			return false;
-		return this.getName().equals(otherTown.getName()); // TODO: Change this to UUID when the UUID database is in use.
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(getUUID(), getName());
+		return this.getUUID().equals(otherTown.getUUID());
 	}
 
 	@Override
@@ -360,7 +358,7 @@ public class Town extends Government implements TownBlockOwner {
 		if (!residentsSorted)
 			sortResidents();
 		
-		return Collections.unmodifiableList(residents);
+		return residentsView;
 	}
 
 	public List<Resident> getRank(String rank) {
@@ -902,6 +900,21 @@ public class Town extends Government implements TownBlockOwner {
 	public void removeTownBlock(TownBlock townBlock) {
 
 		if (hasTownBlock(townBlock)) {
+			// Remove the plot group for this town block.
+			final PlotGroup plotGroup = townBlock.getPlotObjectGroup();
+			if (plotGroup != null) {
+				plotGroup.removeTownBlock(townBlock);
+
+				if (!plotGroup.hasTownBlocks()) {
+					new PlotGroupDeletedEvent(plotGroup, null, PlotGroupDeletedEvent.Cause.NO_TOWNBLOCKS).callEvent();
+					removePlotGroup(plotGroup);
+
+					TownyUniverse.getInstance().getDataSource().removePlotGroup(plotGroup);
+				}
+
+				townBlock.removePlotObjectGroup();
+			}
+
 			// Remove the spawn point for this outpost.
 			if (townBlock.isOutpost() || isAnOutpost(townBlock.getCoord())) {
 				removeOutpostSpawn(townBlock.getCoord());

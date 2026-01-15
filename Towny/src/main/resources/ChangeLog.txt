@@ -10458,7 +10458,7 @@ v0.92.0.11:
   - Add new constructor for ListDataField, courtesy of SulkyWhale with PR #7937.
 0.101.2.5:
   - Target Paper instead of spigot, courtesy of Warrior with PR #7885.
-    - Towny will not require Paper or one of its derivatives.
+    - Towny will now require Paper or one of its derivatives.
     - Towny will not start if your server uses Spigot or Craftbukkit.
     - Some plugins will not work until they are updated to no longer use the now-removed `com.palmergames.adventure` package.
       - Before you update Towny look at whether you use TownyResources, TownyFlight, other Towny add-on plugins, Sponsor plugins created by LlmDl.
@@ -10499,3 +10499,149 @@ v0.92.0.11:
   - Improve lingering potion protection, courtesy of Warrior with PR #7991.
   - Replace pre 1.19 entity/block keys with constants, courtesy of Warrior with PR #7992.
   - Update inventory system to use components & PDC, courtesy of Warrior with PR #7982.
+0.101.2.7:
+  - Fix the changelog reader thinking the limit has been reached, courtesy of Warrior with PR #7994.
+  - Fix getting lingering potion effects on legacy versions, courtesy of Warrior with PR #7997.
+    - Closes #7996.
+  - Fix getting respawn location <1.21.5, courtesy of Warrior with PR #7998.
+    - Closes #7995.
+  - Fix literal translatables attempting to translate, courtesy of Warrior with PR #7999.
+  - Add setting for default peaceful nation to create, courtesy of RyanoDino with PR #8000.
+    - Closes #7970.
+  - New Config Option: nation.default_neutral
+    - Default: true
+    - Default neutral status of the nation (are new nations neutral by default?)
+  - Add saving of hasActiveWar for towns and nations, courtesy of SulkyWhale with PR #8002.
+  - Fix mountable entities having their saddles sheared, copper golems having their items dropped.
+  - Add ability to set max town and nation board lengths.
+  - New Config Option: global_town_settings.max_board_length
+    - Default: 170
+    - The maximum number of characters that the town (and nation,) board messages can be.
+  - Add unformatted upkeep PAPI placeholders.
+    - Closes #7943.
+  - New PAPI Placeholders:
+    - %townyadvanced_daily_town_upkeep_unformatted% - An unformatted town upkeep amount.
+    - %townyadvanced_daily_nation_upkeep_unformatted% - An unformatted nation upkeep amount.
+0.101.2.8:
+  - Fix unneeded msg_invalid_name exception message from /n ally.
+    - Closes #8006.
+0.102.0.0:
+  - Bump version for release.
+0.102.0.1:
+  - Add new shear-to-remove-saddle mobs to entity list, courtesy of Warrior with PR #8018.
+  - Fix admin permissions on LuckPerms-using servers where OPs do not receieve towny.admin.
+    - OPs will now be given the towny.admin permission node by default.
+    - Closes #8017.
+  - New PAPI Placeholders:
+    - %townyadvanced_player_location_in_homeblock% - Returns a string TRUE or FALSE if the player is in a homeblock.
+    - %townyadvanced_player_location_in_homeblock_owntown% - Returns a string TRUE or FALSE if the player is in a homeblock belonging to their town.
+    - %townyadvanced_player_location_in_homeblock_ownnation% - Returns a string TRUE or FALSE if the player is in a homeblock belonging to a town in the player's nation.
+    - %townyadvanced_player_location_in_homeblock_enemy% - Returns a string TRUE or FALSE if the player is in a homeblock belonging to a town that is enemied with the player's town.
+    - %townyadvanced_player_location_in_homeblock_ally% - Returns a string TRUE or FALSE if the player is in a homeblock belonging to a town that is allied with the player's town.
+    - Closes #8020.
+  - Add new message shown to mayor and assistants when someone spawns to their town and it has resulted in the town earning the money.
+    - Closes #7953.
+  - New Config Option: global_town_settings.rank_names_to_be_treated_as_assistants
+    - Default: assistant
+    - The ranks to be given special priviledges, for instance when messages would be shown to only VIP town members.
+    - All ranks should be as defined in `townyperms.yml`.
+0.102.0.2:
+  - Fix town bank accounts being removed before the feature isDeletedObjectBalancePaidToOwner can finish logging into the bank history book.
+    - Closes #8031.
+  - Fix the message shown to mayors and assistants when someone spawns to their town showing prior to the teleport warmup time, resulting in unneeded messages.
+  - Add option to refund towns upon deletion.
+    - Adds a configurable system based on town age and size limits, to refund recently-made, "small" towns their full cost.
+    - Closes #7974.
+  - New Config Option: economy.refund_deleted_new_towns.allow_refund_on_deletion
+    - Default: false
+    - Will towns that are recently created allow for a refund when the town is deleted by using the /t delete command?
+    - This allows a player who has founded their town in the wrong place to delete their town and move it.
+    - Towns must be less than the age specified below and have a configuable number of townblocks.
+  - New Config Option: economy.refund_deleted_new_towns.max_town_age_in_hours
+    - Default: 1
+    - How many hours old is a town allowed to be in order to get the refund when being deleted.
+  - New Config Option: economy.refund_deleted_new_towns.max_townblocks
+    - Default: 8
+    - How many townblocks is a town allowed to have in order to qualify for the refund.
+  - Fix exception when attempting to query NPC perms through LuckPerms, courtesy of Warrior with PR #8033.
+  - Future proof minecraft version parsing, courtesy of Warrior with PR #8034.
+  - Fix 2 points where permission node tests bypass the adminbypass mode.
+  - Add /town nearby command, courtesy of Nrleryx with PR #8040. (First-Time Contributor!)
+  - New Permission Node: towny.command.town.nearby
+    - Will be automatically added to your nomads in the townyperms.yml.
+  - New Command: /town nearby
+    - Shows a player up to 10 towns that are nearest to the player in the order of closest to furthest.
+0.102.0.3:
+  - Add test preventing copper golems moving items beyond same-owner plots.
+  - Fix towns having a spawn point in a non-existent world preventing the town being deleted.
+  - Add protection for the waxed copper golem statues into the switch category when COPPER_GOLEM_STATUE is a switch_id.
+  - Add waxed versions of copper chests into the COPPER_CHEST category.
+  - Added option to hide nations and towns from the list pages when their banks are less than or equal to zero.
+  - New Config Option: economy.banks.hide_zero_or_under_banks_on_list_outputs
+    - Default: false
+    - When true town and nations with a bank balance of less than or equal to zero will not appear on the town and nation lists.
+  - Fix admins with the adminbypass mode active not receiving teleport warmups and cooldowns.
+  - Add the option to make the town bank cap plot-based.
+    - Closes #8045.
+  - New Config Option: economy.banks.town_bank_cap_is_plotbased
+    - Default: false
+    - When true the bank cap is plot-based. The number of townblocks/plots a town has claimed will be multiplied by the above town_bank_cap value.
+  - New Config Option: economy.banks.plotbased_bank_cap_uses_town_level_modifier
+    - Default: false
+    - When true the plot-based bank cap will also be multiplied by the town_levels' bank cap modifiers.
+  - New Config Option: economy.banks.plotbased_town_bank_cap_minimum
+    - Default: 0.0
+    - The smallest cap that banks can have while using the plotbased bank cap.
+    - If this value is larger than the naturally-derived townblocks * town_bank_cap equation, this minimum will be used instead.
+  - Fix a logic error in the PlotGroup#setResident function, courtesy of Remasuri with PR #8043. (First-Time Contributor!)
+  - Bit pack perms in TownyPermission objects, courtesy of Warrior with PR #8048.
+  - Remove world references stored inside WorldCoord, courtesy of Warrior with PR #8050.
+  - Fix message when attempting to overclaim your own town, courtesy of Warrior with PR #8051.
+  - Reduce allocations done by Resident hasRank methods, courtesy of Warrior with PR #8037.
+  - Bump com.zaxxer:HikariCP from 6.2.1 to 7.0.2.
+  - Bump org.apache.maven.plugins:maven-surefire-plugin from 3.5.2 to 3.5.4.
+  - Bump org.apache.maven.plugins:maven-jar-plugin from 3.4.2 to 3.5.0.
+  - Bump org.apache.maven.plugins:maven-compiler-plugin from 3.13.0 to 3.14.1.
+  - Bump org.apache.logging.log4j:log4j-core from 2.24.3 to 2.25.3.
+  - Bump org.apache.maven.plugins:maven-shade-plugin from 3.6.0 to 3.6.1.
+  - Lazily initialize maps used by TownBlock, courtesy of Warrior with PR #8049.
+  - Fix occasions where plot groups exist in townblocks being removed.
+  - Fix the townyperms group command not working with capitalized groups, courtesy of Warrior with PR #8055.
+  - Add support for enabling conquering on a town via townyadmin command.
+  - Check the chunk is still wilderness after confirmation in /town new, courtesy of Veyronity with PR #8059. (First-Time Contributor!)
+  - Add null checks to the task schedulers, courtesy of Warrior with PR #8060.
+0.102.0.4:
+  - UUID Database Update!
+    - READ CAREFULLY, THIS UPDATE HAS CHANGES THAT CANNOT BE REVERSED EASILY.
+    - Since Minecraft added UUIDs to players there has always been the idea of changing Towny over to using UUIDs as the main key in our database,
+      but due to database instability this was not something that was considered a smart change. Database stability was majorly improved years ago
+      however and starting in 2022 and 2023 I (LlmDl,) had pull requests on deck exploring/planning what a UUID-based database would look like for
+      Towny. In the middle-to-late 2025 Warrior decided to revive the UUID database concept, breaking things into bite-sized pull requests that
+      made the concept easier to review and merge. Those pull requests are as follows:
+      - Load UUIDs for residents, towns & nations early, courtesy of Warrior with PR #7945.
+      - Replace references to names with UUIDs in the database, courtesy of Warrior with PR #7962.
+      - Clean up town/nation/resident renaming logic, courtesy of Warrior with PR #7963.
+      - Use UUIDs for town/nation/resident file names in flatfile, courtesy of Warrior with PR #8023.
+      Thanks to Warrior's efforts the UUID database has become a reality!
+    - What this means for Towny server admins:
+      - The database no longer saves using resident, town and nation names. Instead you will see UUID-named .txt files in the resident, town and
+        nation folders, and UUIDs in the lists of friends, enemies and allies.
+      - Once you updated to this version your database will be converted and there is no going back. Towny will create backups of your pre-UUID
+        database if you have backups enabled in the Towny config.yml and you are using Towny in flatfile!
+      - If your Towny database is stored in MYSQL you need to make your own backup! Towny doesn't back up MYSQL databases!
+    - Benefits:
+      - Your Towny database just got more error-proof.
+      - Renaming of residents, towns, nations should no longer be prone to edge-case scenarios that could cause issues.
+      - Server hosts which don't allow some unicode characters in the server file system's filenames will no longer fail to save/load towns and
+        nations with special (usually accented,) characters.
+      - If you change hosts and your future-host does not allow the above unicode characters to be used in the filesystem, your server will not
+        immediately fail to load!
+      - The main issue with Towny databases over the last few years was typically towns/nations being named with characters that server hosting
+        would not allow in the filesystem, this database update will make this issue non-existant, which is why the benefits of this update
+        outweigh the cons.
+    - Cons:
+      - The database's residents/towns/nations are no longer saved with their names. This makes editing your database manually trickier.
+        - To help this out the residents' files will now contain their town's last-known name, the towns' files will contain their nation's and
+          mayor's last-known name. All residents, towns and nations files will contain their last-known name in their files.
+    - Ultimately, the benefits have outweighed the cons, stability has been good for Towny databases for 5+ years, and it is time to make this
+      change in order to reduce the complexity of the codebase and to improve how Towny runs on varied server hosts.

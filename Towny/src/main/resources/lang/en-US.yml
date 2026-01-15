@@ -113,6 +113,7 @@ town_help_32: "Use /t set ? for help."
 town_help_33: "Use /t buy ? for help."
 town_help_34: "Use /t toggle ? for help."
 town_help_35: "Use /t rank ? for help."
+town_help_36: 'List nearby towns sorted by distance.'
 
 town_list_help_0: "View the specified page."
 town_list_help_1: "List towns by resident-count, with the specified page."
@@ -2239,6 +2240,7 @@ msg_spawn_cost_free: 'Free'
 msg_plot_already_of_type: 'This plot is already a %s type.'
 
 msg_town_board_reset: '&bTown board reset.'
+msg_nation_board_reset: '&bNation board reset.'
 
 msg_town_has_no_jailslots: 'The town jail is full.'
 msg_player_has_been_sent_to_jail_into_cell_number_x_for_x_hours_by_x_for_x_bail: '%s has been sent to %s into cell number %s for %s hours with a bail of %s by %s.'
@@ -2670,3 +2672,17 @@ time-x-years-ago: "%d years ago"
 
 # Shown instead of status_lastonline if the player is currently online
 status_onlinesince: "Online Since:"
+
+msg_a_player_spawned_to_your_town_earning_you_x: "The player %s has spawned at your town, earning you %s."
+
+msg_you_have_been_refunded_your_town_cost: "You have been refunded %s because your town was less than %s hour(s) old and did not claim more than %s townblocks."
+
+msg_nearby_towns: 'Nearby Towns'
+msg_no_towns_nearby: 'No towns found nearby.'
+msg_nearby_town_format: '<green>%s <white>(%s blocks)'
+msg_nearby_town_nation: ' <aqua>[%s]'
+
+msg_err_must_specify_days_to_be_conquered: "You must specify a number of days to be conquered for, ie: 1 or more, or -1 or unlimited for an indefinite conquering."
+msg_conquered_status_granted: "You have set %s to have the conquered status for %s days."
+msg_conquered_status_granted_unlimited: "You have set %s to have the conquered status for an indefinite amount of days."
+msg_err_must_specify_on_or_off: "You must specify on or off."

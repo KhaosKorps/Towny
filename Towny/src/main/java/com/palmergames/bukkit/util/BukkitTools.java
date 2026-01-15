@@ -242,7 +242,11 @@ public class BukkitTools {
 	
 	public static OfflinePlayer getOfflinePlayerForVault(String name) {
 
-		return Bukkit.getOfflinePlayer(UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8)));
+		return Bukkit.getOfflinePlayer(getOfflinePlayerUUID(name));
+	}
+	
+	public static UUID getOfflinePlayerUUID(String name) {
+		return UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
 	}
 	
 	public static String convertCoordtoXYZ(Location loc) {
@@ -343,12 +347,26 @@ public class BukkitTools {
 	}
 	
 	public static CompletableFuture<Location> getRespawnLocation(final Player player) {
+		if (MinecraftVersion.CURRENT_VERSION.isOlderThan(MinecraftVersion.MINECRAFT_1_21_5)) {
+			return getRespawnLocationOld(player);
+		}
+
 		final Location potentialLocation = player.getRespawnLocation(false);
 		if (potentialLocation == null) {
 			return CompletableFuture.completedFuture(null);
 		}
 
 		return potentialLocation.getWorld().getChunkAtAsync(potentialLocation).thenApply(chunk -> player.getRespawnLocation(true));
+	}
+
+	@SuppressWarnings("deprecation") // remove me when 1.21.4 or below is no longer supported
+	private static CompletableFuture<Location> getRespawnLocationOld(final Player player) {
+		final Location potentialLocation = player.getPotentialBedLocation();
+		if (potentialLocation == null) {
+			return CompletableFuture.completedFuture(null);
+		}
+
+		return potentialLocation.getWorld().getChunkAtAsync(potentialLocation).thenApply(chunk -> player.getBedSpawnLocation());
 	}
 	
 	@ApiStatus.Internal
