@@ -1,6 +1,7 @@
  package com.palmergames.bukkit.towny;
 
 import com.earth2me.essentials.Essentials;
+import com.khaoskorps.minecraft.khaoskore.spawner.SpawnerPlugin;
 
 import com.palmergames.bukkit.config.CommentedConfiguration;
 import com.palmergames.bukkit.config.ConfigNodes;
@@ -68,6 +69,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -113,8 +117,10 @@ public class Towny extends JavaPlugin {
 	private final Set<TownyInitException.TownyError> errors = new HashSet<>();
 	
 	private Essentials essentials;
-	
+	private SpawnerPlugin spawner;
+
 	public Essentials getEssentials() { return essentials; }
+	public SpawnerPlugin getSpawner() { return spawner; }
 	
 	public Towny() {
 		plugin = this;
@@ -199,6 +205,10 @@ public class Towny extends JavaPlugin {
 		if (essentials != null)
 			plugin.getLogger().info("✅ Hooked into Essentials");
 
+		setupSpawner();
+		if (spawner != null)
+			plugin.getLogger().info("✅ Hooked into Spawner");
+
 		Bukkit.getLogger().info("=============================================================");
 		if (isError()) {
 			plugin.getLogger().warning("[WARNING] - ***** SAFE MODE ***** " + version);
@@ -230,6 +240,24 @@ public class Towny extends JavaPlugin {
 		Plugin plugin = getServer().getPluginManager().getPlugin("Essentials");
 		if (plugin instanceof Essentials)
 			essentials = (Essentials) plugin;
+	}
+
+	private void setupSpawner() {
+		Plugin plugin = getServer().getPluginManager().getPlugin("Spawner");
+		if (plugin instanceof SpawnerPlugin) {
+			spawner = (SpawnerPlugin) plugin;
+		} else {
+			// Spawner might load after Towny due to circular soft dependency, wait for it
+			getServer().getPluginManager().registerEvents(new Listener() {
+				@EventHandler
+				public void onPluginEnable(PluginEnableEvent event) {
+					if (event.getPlugin() instanceof SpawnerPlugin) {
+						spawner = (SpawnerPlugin) event.getPlugin();
+						Towny.getPlugin().getLogger().info("✅ Hooked into Spawner");
+					}
+				}
+			}, this);
+		}
 	}
 
 	public void loadFoundation(boolean reload) {
