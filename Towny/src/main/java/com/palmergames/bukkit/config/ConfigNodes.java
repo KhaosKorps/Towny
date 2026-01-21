@@ -2528,6 +2528,12 @@ public enum ConfigNodes {
 			"",
 			"# How long does a resident have to wait to join a town, after joining the server.",
 			"# Set to 0m to disable. 1m = 1 minute, 1h = 1 hour, 1d = 1 day."),
+	RES_SETTINGS_WARN_PLAYER_ON_OUTLAW_MESSAGE_COOLDOWN_TIME(
+		"resident_settings.warn_player_on_outlaw_message_cooldown_in_seconds",
+		"30",
+		"",
+		"# How many seconds in between warning messages, to prevent spam."
+	),
 	ECO(
 			"economy",
 			"",
@@ -3426,6 +3432,12 @@ public enum ConfigNodes {
 			"# If a Town has less claims than max_duration hours, those claims' permissions are opened up much more slowly with hours passing between",
 			"# plots opening up, ie: 36 claims and 72 max hours = 1 claim every 2 hours.",
 			"# This system is meant to give players across many time zones the chance to loot a town when it falls into ruin."),
+	
+	TOWN_RUINING_EMPTY_TOWNS_BECOME_RUINS(
+			"town_ruining.empty_towns_become_ruins",
+			"false",
+			"",
+			"# When enabled, when the last resident is removed from a town and it becomes empty (such as when inactive resident deletion is enabled), the town will turn into a ruin instead of being immediately removed."),
 
 
 	ASCII_MAP_SYMBOLS("ascii_map_symbols", "", "", "",

@@ -13,6 +13,7 @@
 
     <artifactId>towny</artifactId>
     <packaging>jar</packaging>
+    <version>0.102.0.6</version>
 
     <licenses>
         <license>
@@ -31,7 +32,7 @@
     <properties>
         <project.bukkitAPIVersion>1.19</project.bukkitAPIVersion>
         <skipTests>true</skipTests>
-        <junit.version>5.13.4</junit.version>
+        <junit.version>6.0.2</junit.version>
         <maven.deploy.skip>false</maven.deploy.skip>
     </properties>
 
@@ -111,7 +112,7 @@
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultUnlockedAPI</artifactId>
-            <version>2.9</version>
+            <version>2.15</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -159,7 +160,7 @@
         <dependency>
             <groupId>net.luckperms</groupId>
             <artifactId>api</artifactId>
-            <version>5.4</version>
+            <version>5.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -269,7 +270,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.2</version>
+                    <version>3.12.0</version>
                     <executions>
                         <execution>
                             <id>install</id>
@@ -329,7 +330,7 @@
                 <plugin>  <!-- Create sources.jar -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.4.0</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>

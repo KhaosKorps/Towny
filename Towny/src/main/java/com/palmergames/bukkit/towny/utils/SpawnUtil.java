@@ -798,8 +798,12 @@ public class SpawnUtil {
 		boolean isUsingAdminBypass = resident.hasMode("adminbypass");
 		if (TownyTimerHandler.isTeleportWarmupRunning() && (!hasPerm(player, PermissionNodes.TOWNY_SPAWN_ADMIN_NOWARMUP) || isUsingAdminBypass)) {
 			// Use teleport warmup
-			TownyMessaging.sendMsg(player, Translatable.of("msg_town_spawn_warmup", TownySettings.getTeleportWarmupTime()));
-			TeleportWarmupTimerTask.requestTeleport(resident, spawnLoc, cooldown, refundAccount, cost);
+			int warmupTime = TownyUniverse.getInstance().getPermissionSource().getGroupPermissionIntNode(player.getName(), PermissionNodes.TOWNY_TELEPORT_WARMUP_SECONDS.getNode());
+			if (warmupTime == -1)
+				warmupTime = TownySettings.getTeleportWarmupTime();
+			TownyMessaging.sendMsg(player, Translatable.of("msg_town_spawn_warmup", warmupTime));
+			long teleportTime = System.currentTimeMillis() + (warmupTime * 1000);
+			TeleportWarmupTimerTask.requestTeleport(resident, teleportTime, spawnLoc, cooldown, refundAccount, cost);
 		} else {
 			// Don't use teleport warmup
 			if (player.getVehicle() != null)
